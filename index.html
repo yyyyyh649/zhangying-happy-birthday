@@ -15,6 +15,7 @@
             --accent-soft: #ffd0de;
             --envelope: #f8d9e3;
             --envelope-deep: #eeb5c9;
+            --envelope-rose: #f3bfd2;
             --envelope-line: rgba(175, 90, 121, 0.28);
             --line: rgba(185, 82, 121, 0.2);
             --shadow: 0 24px 60px rgba(128, 34, 74, 0.16);
@@ -82,17 +83,91 @@
         }
 
         .envelope-scene {
-            width: min(920px, 100%);
+            width: min(680px, 92vw);
             position: relative;
             perspective: 1300px;
+            overflow: visible;
+            transition: width 0.85s cubic-bezier(0.22, 0.61, 0.36, 1);
         }
 
         .envelope-cover {
-            position: absolute;
-            inset: 0;
+            position: relative;
+            inset: auto;
+            height: clamp(320px, 56vh, 420px);
             z-index: 4;
             border-radius: 28px;
             overflow: hidden;
+            border: 1px solid rgba(255, 233, 242, 0.9);
+            background: linear-gradient(160deg, #fbe4ed 0%, #f2c9d9 100%);
+            box-shadow: 0 26px 55px rgba(143, 55, 93, 0.26);
+            animation: envelopeFloat 4.8s ease-in-out infinite;
+        }
+
+        .envelope-cover::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.35), transparent 48%),
+                radial-gradient(circle at 86% 16%, rgba(255, 255, 255, 0.2), transparent 52%);
+            pointer-events: none;
+        }
+
+        .envelope-cover::after {
+            content: "";
+            position: absolute;
+            left: 8%;
+            right: 8%;
+            top: 12%;
+            height: 16%;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0));
+            pointer-events: none;
+        }
+
+        .envelope-inner {
+            position: absolute;
+            left: 9%;
+            right: 9%;
+            top: 13%;
+            height: 41%;
+            border-radius: 18px 18px 26px 26px;
+            background:
+                linear-gradient(180deg, #f7e2eb 0%, #f2d2e0 100%),
+                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.35) 0 8px, rgba(255, 255, 255, 0.15) 8px 16px);
+            border: 1px solid rgba(255, 244, 248, 0.8);
+            box-shadow: inset 0 10px 16px rgba(255, 255, 255, 0.25);
+            z-index: 1;
+        }
+
+        .stamp-mark {
+            position: absolute;
+            right: 18px;
+            top: 18px;
+            font-size: 0.78rem;
+            color: rgba(175, 81, 117, 0.72);
+            border: 1px dashed rgba(175, 81, 117, 0.58);
+            padding: 4px 8px;
+            border-radius: 999px;
+            transform: rotate(8deg);
+            z-index: 5;
+            letter-spacing: 0.04em;
+            background: rgba(255, 241, 246, 0.6);
+        }
+
+        body.is-closed .letter {
+            display: none;
+        }
+
+        body.play-open .envelope-scene {
+            width: min(920px, 100%);
+        }
+
+        body.play-open .envelope-cover {
+            position: absolute;
+            inset: 0;
+            height: auto;
+            animation: coverLift 1.3s ease forwards 3.2s;
         }
 
         .flap {
@@ -107,6 +182,15 @@
             transform-origin: 50% 0%;
             transform-style: preserve-3d;
             box-shadow: inset 0 -12px 22px rgba(173, 79, 117, 0.18);
+            z-index: 3;
+        }
+
+        .flap::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0));
+            opacity: 0.9;
         }
 
         .pocket {
@@ -115,9 +199,12 @@
             right: 0;
             bottom: 0;
             height: 66%;
-            background: linear-gradient(150deg, var(--envelope) 0%, var(--envelope-deep) 100%);
+            background:
+                linear-gradient(150deg, var(--envelope) 0%, var(--envelope-deep) 100%),
+                linear-gradient(45deg, rgba(255, 255, 255, 0.2), transparent 44%);
             border-top: 1px solid var(--envelope-line);
             box-shadow: inset 0 8px 14px rgba(255, 255, 255, 0.28), inset 0 -12px 18px rgba(160, 72, 109, 0.2);
+            z-index: 2;
         }
 
         .pocket::before {
@@ -149,6 +236,7 @@
             pointer-events: auto;
             transition: transform 0.25s ease, box-shadow 0.25s ease;
             animation: sealPulse 2.1s ease-in-out infinite;
+            z-index: 7;
         }
 
         .seal:hover {
@@ -163,6 +251,33 @@
 
         body.play-open .seal {
             animation: none;
+        }
+
+        .burst-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 8;
+        }
+
+        .burst-heart {
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 0.95rem;
+            line-height: 1;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.4);
+            animation: burstFly var(--dur, 0.95s) ease-out forwards;
+            text-shadow: 0 6px 10px rgba(124, 36, 72, 0.25);
+        }
+
+        .envelope-scene.is-opening {
+            animation: envelopeShake 0.42s ease;
+        }
+
+        .envelope-scene.is-opening .seal {
+            animation: sealPress 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         .letter::before {
@@ -288,7 +403,7 @@
         }
 
         body.play-open .envelope-cover {
-            animation: coverLift 1.3s ease forwards 3.2s;
+            box-shadow: none;
         }
 
         body.play-open .reveal {
@@ -308,6 +423,7 @@
             pointer-events: none;
             opacity: 0.9;
             animation: tipBlink 1.8s ease-in-out infinite;
+            z-index: 7;
         }
 
         body.play-open .open-tip {
@@ -353,6 +469,16 @@
             }
         }
 
+        @keyframes envelopeFloat {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
         @keyframes sealPulse {
             0%,
             100% {
@@ -360,6 +486,51 @@
             }
             50% {
                 transform: translate(-50%, -50%) scale(1.08);
+            }
+        }
+
+        @keyframes sealPress {
+            0% {
+                transform: translate(-50%, -50%) scale(1.08);
+            }
+            30% {
+                transform: translate(-50%, -50%) scale(0.88);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes burstFly {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.4);
+            }
+            16% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(-50% + var(--x, 0px)), calc(-50% + var(--y, 0px))) rotate(var(--r, 0deg)) scale(1.18);
+            }
+        }
+
+        @keyframes envelopeShake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-3px);
+            }
+            40% {
+                transform: translateX(3px);
+            }
+            60% {
+                transform: translateX(-2px);
+            }
+            80% {
+                transform: translateX(2px);
             }
         }
 
@@ -393,14 +564,37 @@
                 border-radius: 18px;
             }
 
+            .envelope-scene {
+                width: min(620px, 94vw);
+            }
+
+            .envelope-cover {
+                height: clamp(280px, 50vh, 360px);
+            }
+
             .envelope-cover {
                 border-radius: 18px;
+            }
+
+            body.play-open .envelope-scene {
+                width: min(920px, 100%);
+            }
+
+            body.play-open .envelope-cover {
+                height: auto;
             }
 
             .seal {
                 width: 62px;
                 height: 62px;
                 font-size: 1.25rem;
+            }
+
+            .stamp-mark {
+                font-size: 0.7rem;
+                top: 14px;
+                right: 14px;
+                padding: 3px 7px;
             }
 
             .open-tip {
@@ -446,19 +640,34 @@
             .open-tip {
                 animation: none;
             }
+
+            .envelope-cover {
+                animation: none;
+            }
+
+            .envelope-scene.is-opening {
+                animation: none;
+            }
+
+            .burst-heart {
+                animation-duration: 0.45s;
+            }
         }
     </style>
 </head>
-<body>
+<body class="is-closed">
 <div class="float-shape shape-a"></div>
 <div class="float-shape shape-b"></div>
 
 <div class="envelope-scene">
     <div class="envelope-cover">
+        <div class="envelope-inner"></div>
         <div class="flap"></div>
         <div class="pocket"></div>
+        <div class="stamp-mark">FOR YOU</div>
         <button class="seal" id="openEnvelopeBtn" type="button" aria-label="打开信封">❤</button>
-        <div class="open-tip">点击印章打开信封</div>
+        <div class="open-tip">轻点印章拆开信封</div>
+        <div class="burst-layer" id="burstLayer" aria-hidden="true"></div>
     </div>
 
 <main class="letter">
@@ -518,8 +727,48 @@
 <script>
     (function () {
         var openButton = document.getElementById("openEnvelopeBtn");
+        var burstLayer = document.getElementById("burstLayer");
+        var envelopeScene = document.querySelector(".envelope-scene");
         if (!openButton) {
             return;
+        }
+
+        function spawnBurst() {
+            if (!burstLayer) {
+                return;
+            }
+
+            var buttonRect = openButton.getBoundingClientRect();
+            var layerRect = burstLayer.getBoundingClientRect();
+            var originX = buttonRect.left + buttonRect.width / 2 - layerRect.left;
+            var originY = buttonRect.top + buttonRect.height / 2 - layerRect.top;
+            var symbols = ["❤", "♥", "✦", "❀"];
+            var colors = ["#f24f90", "#f08db7", "#ffb8d2", "#ffdbe9"];
+            var count = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 8 : 18;
+
+            for (var i = 0; i < count; i++) {
+                var particle = document.createElement("span");
+                var angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.45;
+                var distance = 64 + Math.random() * 120;
+                var driftX = Math.cos(angle) * distance;
+                var driftY = Math.sin(angle) * distance - 24;
+                particle.className = "burst-heart";
+                particle.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                particle.style.left = originX + "px";
+                particle.style.top = originY + "px";
+                particle.style.setProperty("--x", driftX.toFixed(2) + "px");
+                particle.style.setProperty("--y", driftY.toFixed(2) + "px");
+                particle.style.setProperty("--r", (Math.random() * 200 - 100).toFixed(2) + "deg");
+                particle.style.setProperty("--dur", (0.8 + Math.random() * 0.55).toFixed(2) + "s");
+                particle.style.color = colors[Math.floor(Math.random() * colors.length)];
+                burstLayer.appendChild(particle);
+
+                (function (node) {
+                    window.setTimeout(function () {
+                        node.remove();
+                    }, 1400);
+                })(particle);
+            }
         }
 
         openButton.addEventListener("click", function () {
@@ -527,8 +776,21 @@
                 return;
             }
 
-            document.body.classList.add("play-open");
             openButton.disabled = true;
+            spawnBurst();
+
+            if (envelopeScene) {
+                envelopeScene.classList.add("is-opening");
+            }
+
+            window.setTimeout(function () {
+                document.body.classList.remove("is-closed");
+                document.body.classList.add("play-open");
+
+                if (envelopeScene) {
+                    envelopeScene.classList.remove("is-opening");
+                }
+            }, 430);
         });
     })();
 </script>
